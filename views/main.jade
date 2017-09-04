@@ -1,0 +1,36 @@
+extends layout
+
+block extra
+    link(rel='stylesheet', href='/css/an.css')
+    link(rel='stylesheet', href='/css/an-phone.css')
+    link(rel='stylesheet', href='/css/bootstrap.css')
+    link(rel='stylesheet', href='/css/swiper3.1.10.min.css')
+
+block content
+    h1= title
+    .container.an-newslist
+        .row.lb-row-all.lb-all-goutop
+            .col-xs-12.col-md-8.lb-left-float
+                ul.list-unstyled.lb-left-all
+                    each val , index in news
+                        li.media
+                            .media-left.list-left-img-all
+                                span.list-left-img
+                                    img(name='img', src='/')
+                            .media-body.lb-left-h4
+                                h4
+                                    a(name='url', href='/')=val.title
+                                ul.list-inline.lb-right-xiaoimg
+                                    img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/rili.png', height='14', width='13')
+                                    li=val.date
+                                    img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/news-nr-yulan.png', height='9', width='16')
+                                    li=val.school
+                                p=val.abstract
+
+    script.
+        var news = !{JSON.stringify(news)};
+        for (var i = 0; i < news.length; i++) {
+            document.getElementsByName("url")[i].href = news[i].url;
+            document.getElementsByName("img")[i].src = news[i].img;
+        };
+

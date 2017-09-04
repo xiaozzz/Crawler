@@ -9,12 +9,14 @@ mongoose.connect(mongourl);
 var Schema = mongoose.Schema;
 //骨架模版
 var newsSchema = new Schema({
+    img : String,
     title : String,
     date : String,
     abstract : String,
     url : String,
     text : String,
-    _id : String
+    _id : String,
+    school: String
 });
 //模型
 var News = mongoose.model('News', newsSchema);
@@ -36,7 +38,7 @@ var c1 = async function(){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 2;
+        var pageNum = 1;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://www.oir.pku.edu.cn/index.php?g=portal&m=list&a=index&id=17&p=' + i);
         }
@@ -45,33 +47,33 @@ var c1 = async function(){
                 .end(async function (err, page) {
                     var $ = cheerio.load(page.text);
                     //console.log(page.text);
-                    var quoteUrls = $('div.media-body');
+                    var quoteUrls = $('li.media');
                     for (var i = 0; i < quoteUrls.length; i++) {
                         //console.log(quoteUrls.eq(i).text());
-                        var title = quoteUrls.eq(i).children("h4").children("a").text();
-                        var date = quoteUrls.eq(i).children("ul").children("li").eq(0).text();
-                        var abstract = quoteUrls.eq(i).children("p").text();
-                        var url = "http://www.oir.pku.edu.cn" + quoteUrls.eq(i).children("h4").children("a").attr("href");
+                        var img = "http://www.oir.pku.edu.cn" + quoteUrls.eq(i).children("div").eq(0).children("span").children("img").attr("src");
+
+                        var title = quoteUrls.eq(i).children("div").eq(1).children("h4").children("a").text();
+                        var date = quoteUrls.eq(i).children("div").eq(1).children("ul").children("li").eq(0).text();
+                        var abstract = quoteUrls.eq(i).children("div").eq(1).children("p").text();
+                        var url = "http://www.oir.pku.edu.cn" + quoteUrls.eq(i).children("div").eq(1).children("h4").children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
-                        var _id = md5.update(title + date + abstract + url).digest('base64');
+                        var _id = md5.update(title + url).digest('base64');
 
                         var text = await parseBody(url);
 
-                        // console.log(text);
-                        // console.log(quoteUrls.eq(i).children("h4").children("a").text());
-                        // console.log(quoteUrls.eq(i).children("ul").children("li").eq(0).text());
-                        // console.log(quoteUrls.eq(i).children("p").text());
-                        // console.log("http://www.oir.pku.edu.cn" + quoteUrls.eq(i).children("h4").children("a").attr("href"));
+                        // console.log(img);
                         // console.log(_id);
 
                         var news = new News({
+                            img: img,
                             title: title,
                             date: date,
                             abstract: abstract,
                             url: url,
                             text: text,
-                            _id: _id
+                            _id: _id,
+                            school: "北京大学"
                         });
                         news.save(function (err) {
                             if (err) {
@@ -88,6 +90,12 @@ var c1 = async function(){
     }
 };
 
+let getNews =  function(callback){
+    News.find(function (err, news) {
+        if (err) return console.error(err);
+        callback(news);
+    })
+};
 
 var sleep = function (time) {
     return new Promise(function (resolve, reject) {
@@ -112,3 +120,4 @@ var f1 = async function(){
 
 module.exports.f1 = f1;
 module.exports.c1 = c1;
+module.exports.getNews = getNews;
