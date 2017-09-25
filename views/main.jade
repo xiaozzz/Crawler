@@ -22,7 +22,7 @@ block content
                                     a(name='url', href='/')=val.title
                                 ul.list-inline.lb-right-xiaoimg
                                     img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/rili.png', height='14', width='13')
-                                    li=val.date
+                                    li(name='date')=val.date
                                     img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/news-nr-yulan.png', height='9', width='16')
                                     li=val.school
                                 p=val.abstract
@@ -32,5 +32,6 @@ block content
         for (var i = 0; i < news.length; i++) {
             document.getElementsByName("url")[i].href = news[i].url;
             document.getElementsByName("img")[i].src = news[i].img;
+            document.getElementsByName("date")[i].innerHTML = news[i].date.substr(0,10);
         };
 

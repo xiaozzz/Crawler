@@ -11,7 +11,7 @@ var Schema = mongoose.Schema;
 var newsSchema = new Schema({
     img : String,
     title : String,
-    date : String,
+    date : Date,
     abstract : String,
     url : String,
     text : String,
@@ -22,7 +22,7 @@ var newsSchema = new Schema({
 var News = mongoose.model('News', newsSchema);
 
 //北京大学详细页
-var parseBody = function(url) {
+var c1ParseBody = function(url) {
     return new Promise(function (resolve,reject) {
         superagent.get(url)
             .end(function(err,page){
@@ -60,15 +60,19 @@ var c1 = async function(){
                         var md5 = crypto.createHash('md5');
                         var _id = md5.update(title + url).digest('base64');
 
-                        var text = await parseBody(url);
+                        var text = await c1ParseBody(url);
 
                         // console.log(img);
                         // console.log(_id);
 
+                        let saveDate = new Date();
+                        //console.log(date.substr(0,4)+date.substr(5,2)+date.substr(8,2));
+                        saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
+
                         var news = new News({
                             img: img,
                             title: title,
-                            date: date,
+                            date: saveDate,
                             abstract: abstract,
                             url: url,
                             text: text,
