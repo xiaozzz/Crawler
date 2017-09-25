@@ -12,8 +12,10 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/refresh', function(req, res, next) {
-    // utility.c1();
+    utility.c1();
     utility.c2();
+    utility.c3();
+    utility.c4();
     res.render('index', { title: 'Express' });
 });
 

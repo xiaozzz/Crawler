@@ -28,7 +28,7 @@ var c1ParseBody = function(url) {
             .end(function(err,page){
                 var $ = cheerio.load(page.text);
                 var newsText = $('div.nr-news-text');
-                resolve(newsText.children('p').text());
+                resolve(newsText.find('p').text());
             });
     })
 };
@@ -54,7 +54,7 @@ var c1 = async function(){
 
                         var title = quoteUrls.eq(i).children("div").eq(1).children("h4").children("a").text();
                         var date = quoteUrls.eq(i).children("div").eq(1).children("ul").children("li").eq(0).text();
-                        var abstract = quoteUrls.eq(i).children("div").eq(1).children("p").children("script").text();
+                        var abstract = quoteUrls.eq(i).children("div").eq(1).children("p").text();
                         var url = "http://www.oir.pku.edu.cn" + quoteUrls.eq(i).children("div").eq(1).children("h4").children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
@@ -66,7 +66,6 @@ var c1 = async function(){
                         // console.log(_id);
 
                         let saveDate = new Date();
-                        //console.log(date.substr(0,4)+date.substr(5,2)+date.substr(8,2));
                         saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
 
                         var news = new News({
@@ -101,7 +100,7 @@ var c2ParseBody = function(url) {
             .end(function(err,page){
                 var $ = cheerio.load(page.text);
                 var newsText = $('article.article');
-                resolve(newsText.children('p').text());
+                resolve(newsText.find('p').text());
             });
     })
 };
@@ -181,6 +180,156 @@ var c2 = async function(){
     }
 };
 
+//浙江大学详细页
+var c3ParseBody = function(url) {
+    return new Promise(function (resolve,reject) {
+        superagent.get(url)
+            .end(function(err,page){
+                var $ = cheerio.load(page.text);
+                var newsText = $('div.wp_articlecontent');
+                resolve(newsText.find('p').text());
+            });
+    })
+};
+
+//浙江大学新闻主页
+var c3 = async function(){
+    try {
+        //新闻页面URL及页数
+        var pageUrls = [];
+        var pageNum = 1;
+        for (var i = 1; i <= pageNum; i++) {
+            pageUrls.push('http://www.zju.edu.cn/jl/list' + i + '.htm');
+        }
+        pageUrls.forEach(function (pageUrl) {
+            superagent.get(pageUrl)
+                .end(async function (err, page) {
+                    var $ = cheerio.load(page.text);
+                    //console.log(page.text);
+                    var quoteUrls = $('ul.news');
+                    for (var i = 0; i < quoteUrls.children().length; i++) {
+                        let element = quoteUrls.children().eq(i);
+                        var img = "";
+
+                        var title = element.children("a").text();
+                        var date = element.text();
+                        var abstract = "";
+                        var url = "http://www.zju.edu.cn" + element.children("a").attr("href");
+
+                        var md5 = crypto.createHash('md5');
+                        var _id = md5.update(title + url).digest('base64');
+
+                        let saveDate = new Date();
+                        saveDate.setFullYear(date.substr(date.length-11,4), date.substr(date.length-6,2), date.substr(date.length-3,2));
+
+                        // console.log(date.substr(date.length-11,4));
+                        // console.log(date.substr(date.length-6,2));
+                        // console.log(date.substr(date.length-3,2));
+                        //
+                        // console.log("title:"+title);
+                        // console.log("date:"+date);
+                        // console.log("url:"+url);
+
+                        var text = await c3ParseBody(url);
+
+                        var news = new News({
+                            img: img,
+                            title: title,
+                            date: saveDate,
+                            abstract: abstract,
+                            url: url,
+                            text: text,
+                            _id: _id,
+                            school: "浙江大学"
+                        });
+                        news.save(function (err) {
+                            if (err) {
+                                console.log('保存失败');
+                                return;
+                            }
+                            console.log('保存成功');
+                        })
+                    }
+                })
+        })
+    } catch (err){
+        console.log(err);
+    }
+};
+
+//复旦大学详细页
+var c4ParseBody = function(url) {
+    return new Promise(function (resolve,reject) {
+        superagent.get(url)
+            .end(function(err,page){
+                var $ = cheerio.load(page.text);
+                var newsText = $('div.Article_Content');
+                resolve(newsText.find('p').text());
+            });
+    })
+};
+
+//复旦大学新闻主页
+var c4 = async function(){
+    try {
+        //新闻页面URL及页数
+        var pageUrls = [];
+        var pageNum = 1;
+        for (var i = 1; i <= pageNum; i++) {
+            pageUrls.push('http://www.fao.fudan.edu.cn/1691/list' + i + '.htm');
+        }
+        pageUrls.forEach(function (pageUrl) {
+            superagent.get(pageUrl)
+                .end(async function (err, page) {
+                    var $ = cheerio.load(page.text);
+                    //console.log(page.text);
+                    var quoteUrls = $('#wp_news_w6');
+                    for (var i = 0; i < quoteUrls.children("table").children("tbody").children().length; i++) {
+                        let element = quoteUrls.children("table").children("tbody").children().eq(i).children("td").children("table").children("tbody").children("tr");
+                        var img = "";
+
+                        var title = element.children("td").eq(0).children("a").text();
+                        var date = element.children("td").eq(1).text();
+                        var abstract = "";
+                        var url = "http://www.fao.fudan.edu.cn" + element.children("td").eq(0).children("a").attr("href");
+
+                        var md5 = crypto.createHash('md5');
+                        var _id = md5.update(title + url).digest('base64');
+
+                        let saveDate = new Date();
+                        saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
+
+
+                        // console.log("title:"+title);
+                        // console.log("date:"+date);
+                        // console.log("url:"+url);
+
+                        var text = await c4ParseBody(url);
+
+                        var news = new News({
+                            img: img,
+                            title: title,
+                            date: saveDate,
+                            abstract: abstract,
+                            url: url,
+                            text: text,
+                            _id: _id,
+                            school: "复旦大学"
+                        });
+                        news.save(function (err) {
+                            if (err) {
+                                console.log('保存失败');
+                                return;
+                            }
+                            console.log('保存成功');
+                        })
+                    }
+                })
+        })
+    } catch (err){
+        console.log(err);
+    }
+};
 let getNews =  function(callback){
     News.find(function (err, news) {
         if (err) return console.error(err);
@@ -212,4 +361,6 @@ var f1 = async function(){
 module.exports.f1 = f1;
 module.exports.c1 = c1;
 module.exports.c2 = c2;
+module.exports.c3 = c3;
+module.exports.c4 = c4;
 module.exports.getNews = getNews;
