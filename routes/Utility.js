@@ -330,11 +330,28 @@ var c4 = async function(){
         console.log(err);
     }
 };
+
+let getNewsWithFilter = function(keyword, school, callback){
+    var filter = {};
+    if (school != ""){
+        filter.school = school;
+    }
+    if (keyword != ""){
+        var re =new RegExp(keyword,"i");
+        filter.text = re;
+    }
+    console.log(filter);
+    News.find(filter, function (err, news) {
+        if (err) return console.error(err);
+        callback(news);
+    }).sort({'date':'desc'});
+};
+
 let getNews =  function(callback){
     News.find(function (err, news) {
         if (err) return console.error(err);
         callback(news);
-    })
+    }).sort({'date':'desc'});
 };
 
 var sleep = function (time) {
@@ -364,3 +381,4 @@ module.exports.c2 = c2;
 module.exports.c3 = c3;
 module.exports.c4 = c4;
 module.exports.getNews = getNews;
+module.exports.getNewsWithFilter = getNewsWithFilter;

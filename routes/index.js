@@ -6,7 +6,10 @@ var utility = require('./Utility');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    utility.getNews(function(result){
+    // utility.getNews(function(result){
+    //     res.render('main', { title: '新闻列表', news: result });
+    // });
+    utility.getNewsWithFilter("国际","浙江大学",function(result){
         res.render('main', { title: '新闻列表', news: result });
     });
 });
