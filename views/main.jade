@@ -7,31 +7,100 @@ block extra
     link(rel='stylesheet', href='/css/swiper3.1.10.min.css')
 
 block content
-    h1= title
     .container.an-newslist
+        h1= title
+        font(id='updateNews', color='blue') 点击这里立即更新新闻
         .row.lb-row-all.lb-all-goutop
-            .col-xs-12.col-md-8.lb-left-float
+            .col-xs-12.col-md-12.lb-left-float
                 ul.list-unstyled.lb-left-all
                     each val , index in news
                         li.media
-                            .media-left.list-left-img-all
-                                span.list-left-img
-                                    img(name='img', src='/')
                             .media-body.lb-left-h4
                                 h4
                                     a(name='url', href='/')=val.title
                                 ul.list-inline.lb-right-xiaoimg
-                                    img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/rili.png', height='14', width='13')
+                                    //img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/rili.png', height='14', width='13')
                                     li(name='date')=val.date
-                                    img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/news-nr-yulan.png', height='9', width='16')
+                                    //img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/news-nr-yulan.png', height='9', width='16')
                                     li=val.school
                                 p=val.abstract
+        ul.pager
+            li
+                a(href='#', onclick="previous()") 上一页
+            li
+                a(id='currentPage') 1/1
+            li
+                a(href='#', onclick="next()") 下一页
+        .form-group
+            .col-xs-3
+            .col-xs-6
+                .input-group(align='center')
+                    span.input-group-addon 页数
+                    input.form-control(id = 'pageNo', type='text')
+                    span.input-group-btn
+                        button.btn.btn-default(id = 'turn', type='submit') 跳转
+            .col-xs-3
+        br
 
     script.
+        function updateNews(){
+            window.location.href = "/refresh";
+        }
+
         var news = !{JSON.stringify(news)};
         for (var i = 0; i < news.length; i++) {
             document.getElementsByName("url")[i].href = news[i].url;
-            document.getElementsByName("img")[i].src = news[i].img;
             document.getElementsByName("date")[i].innerHTML = news[i].date.substr(0,10);
         };
+        document.getElementById('updateNews').onclick = function(){updateNews()};
 
+
+        var page = !{page};
+        var totalPage = !{totalPage};
+
+        //显示当前页数
+        function showCurrentPage() {
+            document.getElementById("currentPage").innerHTML = (page + 1) + "/" + totalPage;
+        }
+
+        //过滤页数
+        var number = 10;
+
+        showCurrentPage();
+
+        function previous() {
+            if (page > 0) {
+                window.location.href = "/?page=" + (page - 1);
+            } else {
+                alert("当前已经是第一页");
+            }
+        }
+
+        function next() {
+            if (page + 1 < totalPage) {
+                window.location.href = "/?page=" + (page + 1);
+            } else {
+                alert("当前已经是最后一页");
+            }
+        }
+
+        //页数跳转
+        document.getElementById("turn").onclick = function () {
+            turn();
+        };
+
+        function turn() {
+            var pageNo = document.getElementById("pageNo").value;
+            pageNo = parseInt(pageNo);
+            if (isNaN(pageNo)) {
+                alert("页数不合法\n请重新输入");
+                document.getElementById("pageNo").value = "";
+                return;
+            }
+            if (pageNo < 1 || pageNo > totalPage) {
+                alert("页数超出范围\n请重新输入");
+                document.getElementById("pageNo").value = "";
+                return;
+            }
+            window.location.href = "/?page=" + (pageNo - 1);
+        }

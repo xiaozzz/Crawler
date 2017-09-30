@@ -38,7 +38,7 @@ var c1 = async function(){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 1;
+        var pageNum = 2;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://www.oir.pku.edu.cn/index.php?g=portal&m=list&a=index&id=17&p=' + i);
         }
@@ -110,7 +110,7 @@ var c2 = async function(){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 1;
+        var pageNum = 3;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://news.tsinghua.edu.cn/publish/thunews/9662/index'+ (i==1?'':'_'+i) +'.html');
         }
@@ -373,6 +373,18 @@ var f1 = async function(){
         console.log(err);
     }
 };
+
+//每日更新
+let schedule = require("node-schedule");
+var rule1 = new schedule.RecurrenceRule();
+rule1.hour = 1;
+var r1 = schedule.scheduleJob(rule1, function(){
+    c1();
+    c2();
+    c3();
+    c4();
+    console.log("update");
+});
 
 
 module.exports.f1 = f1;
