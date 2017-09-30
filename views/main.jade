@@ -50,7 +50,11 @@ block content
         var news = !{JSON.stringify(news)};
         for (var i = 0; i < news.length; i++) {
             document.getElementsByName("url")[i].href = news[i].url;
-            document.getElementsByName("date")[i].innerHTML = news[i].date.substr(0,10);
+            let year = news[i].date.substr(0,4);
+            let month = news[i].date.substr(5,2);
+            month = parseInt(month) - 1;
+            let day = news[i].date.substr(8,2);
+            document.getElementsByName("date")[i].innerHTML = year + '年' + month + '月' + day + '日';
         };
         document.getElementById('updateNews').onclick = function(){updateNews()};
 
