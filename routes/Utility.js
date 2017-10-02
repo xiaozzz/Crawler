@@ -5,6 +5,7 @@ var http = require('http'),
     mongoose = require('mongoose'),
     mongourl = 'mongodb://root:philip@zzzkky.cn:27017/crawler';
     sha256 = require('../public/javascripts/sha256');
+    nodejieba = require("nodejieba");
 
 mongoose.connect(mongourl);
 var Schema = mongoose.Schema;
@@ -18,6 +19,7 @@ var newsSchema = new Schema({
     text : String,
     _id : String,
     isRead : Boolean,
+    keywords : String,
     school: String
 });
 //模型
@@ -36,11 +38,10 @@ var c1ParseBody = function(url) {
 };
 
 //北京大学新闻主页
-var c1 = async function(){
+var c1 = async function(pageNum){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 2;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://www.oir.pku.edu.cn/index.php?g=portal&m=list&a=index&id=17&p=' + i);
         }
@@ -71,6 +72,13 @@ var c1 = async function(){
                         let saveDate = new Date();
                         saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
 
+                        let keywords = "";
+                        let topN = 6;
+                        let key = nodejieba.extract(title + text, topN);
+                        for (let i = 0; i < key.length; i++){
+                            keywords += key[i].word + " ";
+                        }
+
                         var news = new News({
                             img: img,
                             title: title,
@@ -80,6 +88,7 @@ var c1 = async function(){
                             text: text,
                             _id: _id,
                             isRead : false,
+                            keywords : keywords,
                             school: "北京大学"
                         });
                         news.save(function (err) {
@@ -110,11 +119,10 @@ var c2ParseBody = function(url) {
 };
 
 //清华大学新闻主页
-var c2 = async function(){
+var c2 = async function(pageNum){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 3;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://news.tsinghua.edu.cn/publish/thunews/9662/index'+ (i==1?'':'_'+i) +'.html');
         }
@@ -147,18 +155,17 @@ var c2 = async function(){
 
                         var text = await c2ParseBody(url);
 
-                        // console.log("title:"+title);
-                        // console.log("dateScript:"+dateScript);
-                        // console.log("abstractScript:"+abstractScript);
-                        // console.log("url:"+url);
-                        // console.log("date:"+date);
-                        // console.log("scriptRe:"+date);
-                        // console.log(scriptRe[1]);
-
                         let saveDate = new Date();
                         saveDate.setFullYear(date[1], date[2], date[3]);
 
                         let abstract = scriptRe[1];
+
+                        let keywords = "";
+                        let topN = 6;
+                        let key = nodejieba.extract(title + text, topN);
+                        for (let i = 0; i < key.length; i++){
+                            keywords += key[i].word + " ";
+                        }
 
                         var news = new News({
                             img: img,
@@ -169,6 +176,7 @@ var c2 = async function(){
                             text: text,
                             _id: _id,
                             isRead : false,
+                            keywords : keywords,
                             school: "清华大学"
                         });
                         news.save(function (err) {
@@ -199,11 +207,10 @@ var c3ParseBody = function(url) {
 };
 
 //浙江大学新闻主页
-var c3 = async function(){
+var c3 = async function(pageNum){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 1;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://www.zju.edu.cn/jl/list' + i + '.htm');
         }
@@ -229,15 +236,14 @@ var c3 = async function(){
                         let saveDate = new Date();
                         saveDate.setFullYear(date.substr(date.length-11,4), date.substr(date.length-6,2), date.substr(date.length-3,2));
 
-                        // console.log(date.substr(date.length-11,4));
-                        // console.log(date.substr(date.length-6,2));
-                        // console.log(date.substr(date.length-3,2));
-                        //
-                        // console.log("title:"+title);
-                        // console.log("date:"+date);
-                        // console.log("url:"+url);
-
                         var text = await c3ParseBody(url);
+
+                        let keywords = "";
+                        let topN = 6;
+                        let key = nodejieba.extract(title + text, topN);
+                        for (let i = 0; i < key.length; i++){
+                            keywords += key[i].word + " ";
+                        }
 
                         var news = new News({
                             img: img,
@@ -248,6 +254,7 @@ var c3 = async function(){
                             text: text,
                             _id: _id,
                             isRead : false,
+                            keywords : keywords,
                             school: "浙江大学"
                         });
                         news.save(function (err) {
@@ -278,11 +285,10 @@ var c4ParseBody = function(url) {
 };
 
 //复旦大学新闻主页
-var c4 = async function(){
+var c4 = async function(pageNum){
     try {
         //新闻页面URL及页数
         var pageUrls = [];
-        var pageNum = 1;
         for (var i = 1; i <= pageNum; i++) {
             pageUrls.push('http://www.fao.fudan.edu.cn/1691/list' + i + '.htm');
         }
@@ -308,12 +314,14 @@ var c4 = async function(){
                         let saveDate = new Date();
                         saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
 
-
-                        // console.log("title:"+title);
-                        // console.log("date:"+date);
-                        // console.log("url:"+url);
-
                         var text = await c4ParseBody(url);
+
+                        let keywords = "";
+                        let topN = 6;
+                        let key = nodejieba.extract(title + text, topN);
+                        for (let i = 0; i < key.length; i++){
+                            keywords += key[i].word + " ";
+                        }
 
                         var news = new News({
                             img: img,
@@ -324,6 +332,7 @@ var c4 = async function(){
                             text: text,
                             _id: _id,
                             isRead : false,
+                            keywords : keywords,
                             school: "复旦大学"
                         });
                         news.save(function (err) {

@@ -25,10 +25,18 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/refresh', function(req, res, next) {
-    utility.c1();
-    utility.c2();
-    utility.c3();
-    utility.c4();
+    utility.c1(1);
+    utility.c2(1);
+    utility.c3(1);
+    utility.c4(1);
+    res.redirect('/')
+});
+
+router.get('/init', function(req, res, next) {
+    utility.c1(3);
+    utility.c2(5);
+    utility.c3(2);
+    utility.c4(2);
     res.redirect('/')
 });
 
