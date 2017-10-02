@@ -4,7 +4,7 @@ block extra
     link(rel='stylesheet', href='/css/an.css')
     link(rel='stylesheet', href='/css/an-phone.css')
     link(rel='stylesheet', href='/css/bootstrap.css')
-    link(rel='stylesheet', href='/css/swiper3.1.10.min.css')
+    //link(rel='stylesheet', href='/css/swiper3.1.10.min.css')
 
 block content
     .container.an-newslist
@@ -17,7 +17,7 @@ block content
                         li.media
                             .media-body.lb-left-h4
                                 h4
-                                    a(name='url', href='/')=val.title
+                                    a(name='url', href='/', target='_blank', value='default')=val.title
                                 ul.list-inline.lb-right-xiaoimg
                                     //img(src='http://www.oir.pku.edu.cn/tpl/Pku/Public/img/rili.png', height='14', width='13')
                                     li(name='date')=val.date
@@ -26,11 +26,11 @@ block content
                                 p=val.abstract
         ul.pager
             li
-                a(onclick="previous()") 上一页
+                a(href="javascript:void(0);", onclick="previous()") 上一页
             li
                 a(id='currentPage') 1/1
             li
-                a(onclick="next()") 下一页
+                a(href="javascript:void(0);", onclick="next()") 下一页
         .form-group
             .col-xs-3
             .col-xs-6
@@ -47,13 +47,57 @@ block content
             window.location.href = "/refresh";
         }
 
-        var news = !{JSON.stringify(news)};
-        for (var i = 0; i < news.length; i++) {
-            document.getElementsByName("url")[i].href = news[i].url;
-            let year = news[i].date.substr(0,4);
-            let month = news[i].date.substr(5,2);
+        function createXMLHttpRequest() {
+            var xmlHttp;
+            if (window.XMLHttpRequest) {
+                xmlHttp = new XMLHttpRequest();
+                if (xmlHttp.overrideMimeType)
+                    xmlHttp.overrideMimeType('text/xml');
+            } else if (window.ActiveXObject) {
+                try {
+                    xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                    }
+                }
+            }
+            return xmlHttp;
+        }
+
+        function updateRead(element, callback){
+            console.log(element.getAttribute('value'));
+            let xmlHttp = createXMLHttpRequest();
+            var url = "updateRead?id=" + element.getAttribute('value');
+            xmlHttp.open("GET", url, true);// 异步处理返回
+            xmlHttp.onreadystatechange = callback;
+            xmlHttp.setRequestHeader("Content-Type",
+                "application/x-www-form-urlencoded;");
+            xmlHttp.send();
+        }
+
+        let newsList = !{JSON.stringify(news)};
+        console.log(newsList);
+        for (var i = 0; i < newsList.length; i++) {
+            document.getElementsByName("url")[i].href = newsList[i].url;
+            //设置已读和未读标题样式
+            if (newsList[i].isRead == null || newsList[i].isRead == false){
+                document.getElementsByName("url")[i].style.fontWeight = 'bold';
+            } else {
+                document.getElementsByName("url")[i].style.fontWeight = 'normal';
+            }
+            document.getElementsByName("url")[i].setAttribute('value', newsList[i]._id)
+            document.getElementsByName("url")[i].onclick = function(){
+                updateRead(this, null);
+            };
+
+
+            //设置日期
+            let year = newsList[i].date.substr(0,4);
+            let month = newsList[i].date.substr(5,2);
             month = parseInt(month) - 1;
-            let day = news[i].date.substr(8,2);
+            let day = newsList[i].date.substr(8,2);
             document.getElementsByName("date")[i].innerHTML = year + '年' + month + '月' + day + '日';
         };
         document.getElementById('updateNews').onclick = function(){updateNews()};

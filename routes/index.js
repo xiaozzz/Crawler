@@ -32,4 +32,9 @@ router.get('/refresh', function(req, res, next) {
     res.redirect('/')
 });
 
+router.get('/updateRead', function(req, res, next) {
+    let id = req.query.id;
+    utility.updateRead(id);
+});
+
 module.exports = router;

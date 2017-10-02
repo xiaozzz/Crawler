@@ -4,6 +4,7 @@ var http = require('http'),
     crypto = require('crypto'),
     mongoose = require('mongoose'),
     mongourl = 'mongodb://root:philip@zzzkky.cn:27017/crawler';
+    sha256 = require('../public/javascripts/sha256');
 
 mongoose.connect(mongourl);
 var Schema = mongoose.Schema;
@@ -16,6 +17,7 @@ var newsSchema = new Schema({
     url : String,
     text : String,
     _id : String,
+    isRead : Boolean,
     school: String
 });
 //模型
@@ -58,7 +60,8 @@ var c1 = async function(){
                         var url = "http://www.oir.pku.edu.cn" + quoteUrls.eq(i).children("div").eq(1).children("h4").children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
-                        var _id = md5.update(title + url).digest('base64');
+                        // var _id = md5.update(title + url).digest('base64');
+                        var _id = sha256.sha256_digest(title + url);
 
                         var text = await c1ParseBody(url);
 
@@ -76,6 +79,7 @@ var c1 = async function(){
                             url: url,
                             text: text,
                             _id: _id,
+                            isRead : false,
                             school: "北京大学"
                         });
                         news.save(function (err) {
@@ -130,7 +134,8 @@ var c2 = async function(){
                         var url = "http://news.tsinghua.edu.cn" + quoteUrls.eq(i).children("div").eq(1).children("h3").children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
-                        var _id = md5.update(title + url).digest('base64');
+                        // var _id = md5.update(title + url).digest('base64');
+                        var _id = sha256.sha256_digest(title + url);
 
                         //var text = await c2ParseBody(url);
 
@@ -163,6 +168,7 @@ var c2 = async function(){
                             url: url,
                             text: text,
                             _id: _id,
+                            isRead : false,
                             school: "清华大学"
                         });
                         news.save(function (err) {
@@ -217,7 +223,8 @@ var c3 = async function(){
                         var url = "http://www.zju.edu.cn" + element.children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
-                        var _id = md5.update(title + url).digest('base64');
+                        // var _id = md5.update(title + url).digest('base64');
+                        var _id = sha256.sha256_digest(title + url);
 
                         let saveDate = new Date();
                         saveDate.setFullYear(date.substr(date.length-11,4), date.substr(date.length-6,2), date.substr(date.length-3,2));
@@ -240,6 +247,7 @@ var c3 = async function(){
                             url: url,
                             text: text,
                             _id: _id,
+                            isRead : false,
                             school: "浙江大学"
                         });
                         news.save(function (err) {
@@ -294,7 +302,8 @@ var c4 = async function(){
                         var url = "http://www.fao.fudan.edu.cn" + element.children("td").eq(0).children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
-                        var _id = md5.update(title + url).digest('base64');
+                        // var _id = md5.update(title + url).digest('base64');
+                        var _id = sha256.sha256_digest(title + url);
 
                         let saveDate = new Date();
                         saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
@@ -314,6 +323,7 @@ var c4 = async function(){
                             url: url,
                             text: text,
                             _id: _id,
+                            isRead : false,
                             school: "复旦大学"
                         });
                         news.save(function (err) {
@@ -354,24 +364,15 @@ let getNews =  function(callback){
     }).sort({'date':'desc'});
 };
 
-var sleep = function (time) {
-    return new Promise(function (resolve, reject) {
-        setTimeout(function () {
-            resolve();
-        }, time);
-    })
-};
+let updateRead =  function(id){
+    News.findById(id, function (err, news) {
+        if (err) return console.error(err);
 
-var f1 = async function(){
-    try{
-        for (var i = 1; i <= 10; i++) {
-            console.log('123');
-            await sleep(1000);
-        }
-    }
-    catch (err){
-        console.log(err);
-    }
+        news.isRead = true;
+        news.save(function (err) {
+            if (err) return console.error(err);
+        });
+    });
 };
 
 //每日更新
@@ -387,10 +388,10 @@ var r1 = schedule.scheduleJob(rule1, function(){
 });
 
 
-module.exports.f1 = f1;
 module.exports.c1 = c1;
 module.exports.c2 = c2;
 module.exports.c3 = c3;
 module.exports.c4 = c4;
+module.exports.updateRead = updateRead;
 module.exports.getNews = getNews;
 module.exports.getNewsWithFilter = getNewsWithFilter;
