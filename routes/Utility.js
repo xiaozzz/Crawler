@@ -389,11 +389,12 @@ let schedule = require("node-schedule");
 var rule1 = new schedule.RecurrenceRule();
 rule1.hour = 1;
 var r1 = schedule.scheduleJob(rule1, function(){
-    c1();
-    c2();
-    c3();
-    c4();
-    console.log("update");
+    console.log("update start");
+    c1(1);
+    c2(1);
+    c3(1);
+    c4(1);
+    console.log("update end");
 });
 
 
