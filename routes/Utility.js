@@ -278,7 +278,7 @@ var c4ParseBody = function(url) {
         superagent.get(url)
             .end(function(err,page){
                 var $ = cheerio.load(page.text);
-                var newsText = $('div.Article_Content');
+                var newsText = $('#endtext');
                 resolve(newsText.find('p').text());
             });
     })
@@ -290,22 +290,23 @@ var c4 = async function(pageNum){
         //新闻页面URL及页数
         var pageUrls = [];
         for (var i = 1; i <= pageNum; i++) {
-            pageUrls.push('http://www.fao.fudan.edu.cn/1691/list' + i + '.htm');
+            pageUrls.push('http://news.fudan.edu.cn/news/gjsw/' + i + '.html');
         }
         pageUrls.forEach(function (pageUrl) {
             superagent.get(pageUrl)
                 .end(async function (err, page) {
                     var $ = cheerio.load(page.text);
                     //console.log(page.text);
-                    var quoteUrls = $('#wp_news_w6');
-                    for (var i = 0; i < quoteUrls.children("table").children("tbody").children().length; i++) {
-                        let element = quoteUrls.children("table").children("tbody").children().eq(i).children("td").children("table").children("tbody").children("tr");
+                    var quoteUrls = $('#main_l');
+                    var ele = quoteUrls.children("div").children("ul");
+                    for (var i = 0; i < ele.children("li").length; i++) {
+                        let element = ele.children("li").eq(i);
                         var img = "";
 
-                        var title = element.children("td").eq(0).children("a").text();
-                        var date = element.children("td").eq(1).text();
+                        var title = element.children("a").text();
+                        var date = element.children("span").text();
                         var abstract = "";
-                        var url = "http://www.fao.fudan.edu.cn" + element.children("td").eq(0).children("a").attr("href");
+                        var url = "http://news.fudan.edu.cn/" + element.children("a").attr("href");
 
                         var md5 = crypto.createHash('md5');
                         // var _id = md5.update(title + url).digest('base64');
