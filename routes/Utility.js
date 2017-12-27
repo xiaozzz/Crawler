@@ -3,7 +3,8 @@ var http = require('http'),
     cheerio = require('cheerio'),
     crypto = require('crypto'),
     mongoose = require('mongoose'),
-    mongourl = 'mongodb://root:philip@zzzkky.cn:27017/crawler';
+    //mongourl = 'mongodb://root:philip@zzzkky.cn:27017/crawler';
+    mongourl = 'mongodb://localhost:27017/crawler';
     sha256 = require('../public/javascripts/sha256');
     nodejieba = require("nodejieba");
 
@@ -23,7 +24,7 @@ var newsSchema = new Schema({
     school: String
 });
 //模型
-var News = mongoose.model('News', newsSchema);
+var News = mongoose.model('NewsTest', newsSchema);
 
 //北京大学详细页
 var c1ParseBody = function(url) {
@@ -70,7 +71,7 @@ var c1 = async function(pageNum){
                         // console.log(_id);
 
                         let saveDate = new Date();
-                        saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
+                        saveDate.setFullYear(date.substr(0,4), parseInt(date.substr(5,2))-1, date.substr(8,2));
 
                         let keywords = "";
                         let topN = 6;
@@ -156,7 +157,7 @@ var c2 = async function(pageNum){
                         var text = await c2ParseBody(url);
 
                         let saveDate = new Date();
-                        saveDate.setFullYear(date[1], date[2], date[3]);
+                        saveDate.setFullYear(date[1], parseInt(date[2])-1, date[3]);
 
                         let abstract = scriptRe[1];
 
@@ -234,7 +235,7 @@ var c3 = async function(pageNum){
                         var _id = sha256.sha256_digest(title + url);
 
                         let saveDate = new Date();
-                        saveDate.setFullYear(date.substr(date.length-11,4), date.substr(date.length-6,2), date.substr(date.length-3,2));
+                        saveDate.setFullYear(date.substr(date.length-11,4), parseInt(date.substr(date.length-6,2))-1, date.substr(date.length-3,2));
 
                         var text = await c3ParseBody(url);
 
@@ -313,7 +314,7 @@ var c4 = async function(pageNum){
                         var _id = sha256.sha256_digest(title + url);
 
                         let saveDate = new Date();
-                        saveDate.setFullYear(date.substr(0,4), date.substr(5,2), date.substr(8,2));
+                        saveDate.setFullYear(date.substr(0,4), parseInt(date.substr(5,2))-1, date.substr(8,2));
 
                         var text = await c4ParseBody(url);
 

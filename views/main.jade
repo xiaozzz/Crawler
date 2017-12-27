@@ -95,7 +95,7 @@ block content
             //设置日期
             let year = newsList[i].date.substr(0,4);
             let month = newsList[i].date.substr(5,2);
-            month = parseInt(month) - 1;
+            month = parseInt(month);
             let day = newsList[i].date.substr(8,2);
             document.getElementsByName("date")[i].innerHTML = year + '年' + month + '月' + day + '日';
         };
