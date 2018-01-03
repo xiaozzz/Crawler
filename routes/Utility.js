@@ -3,8 +3,8 @@ var http = require('http'),
     cheerio = require('cheerio'),
     crypto = require('crypto'),
     mongoose = require('mongoose'),
-    //mongourl = 'mongodb://root:philip@zzzkky.cn:27017/crawler';
-    mongourl = 'mongodb://localhost:27017/crawler';
+    mongourl = 'mongodb://root33:philip@zzzkky.cn:27017/crawler';
+    //mongourl = 'mongodb://localhost:27017/crawler';
     sha256 = require('../public/javascripts/sha256');
     nodejieba = require("nodejieba");
 
@@ -24,7 +24,7 @@ var newsSchema = new Schema({
     school: String
 });
 //模型
-var News = mongoose.model('NewsTest', newsSchema);
+var News = mongoose.model('News', newsSchema);
 
 //北京大学详细页
 var c1ParseBody = function(url) {
